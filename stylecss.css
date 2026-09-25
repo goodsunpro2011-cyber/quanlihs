@@ -1,0 +1,131 @@
+/* CÀI ĐẶT CHUNG*/ 
+* { 
+    box-sizing: border-box; 
+} 
+ 
+body { 
+    margin: 0; 
+    padding: 40px; 
+    font-family: Arial, sans-serif; 
+    background-color: white; 
+    color: #222; 
+} 
+ 
+/* KHUNG TRANG*/ 
+  main { 
+    Width: 100%; 
+    max-width: 1200px; 
+    margin: 0 auto; 
+    padding: 30px 35px; 
+    background-color: white; 
+    border-radius: 12px; 
+    box-shadow: 0 4px 15px rgba(161, 108, 108, 0.08); 
+   } 
+ 
+/*TIÊU ĐỀ*/ 
+h1 { 
+    margin: 0 0 30px 0; 
+    text-align: center; 
+    font-size: 32px; 
+ } 
+ 
+/*THANH TÌM KIẾM*/ 
+.search-area { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    margin-bottom: 15px; 
+ } 
+.search-area input { 
+    width: 200px; 
+    height: 38px; 
+    padding: 0 12px; 
+    border: 1px solid #bbb; 
+    border-radius: 6px; 
+    font-size: 15px; 
+ } 
+.search-area input:focus {  
+    outline: none; 
+    border-color:rgb(52, 199, 96) 
+} 
+ 
+/*BỘ LỌC*/ 
+.filter { 
+    display: flex; 
+    align-items: center; 
+    gap: 18px; 
+    margin-bottom: 25px; 
+ } 
+.filter label { 
+    display: flex; 
+    align-items: center; 
+    gap: 5px; 
+ } 
+.filter input[type="checkbox"] { 
+    width: 16px; 
+    height: 16px; 
+} 
+ 
+.filter input[type="date"] { 
+    height: 35px; 
+    padding: 0 8px; 
+    border: 1px solid #bbb; 
+    border-radius: 5px; 
+} 
+ 
+/*TIÊU ĐỀ DANH SÁCH*/ 
+h2 { 
+    margin: 0 0 12px 0; 
+    font-size: 20px; 
+} 
+ 
+/*BẢNG HỌC SINH*/ 
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+} 
+th, 
+td { 
+    border: 2px solid  black; 
+    padding: 10px; 
+    text-align: center; 
+} 
+th { 
+    background-color: #e9ecef; 
+    font-size: 16px; 
+} 
+ 
+td { 
+    font-size: 15px; 
+} 
+ 
+/*HIỆU ỨNG KHI DI CHUỘT*/ 
+tbody tr:hover { 
+    background-color: #a2b358; 
+} 
+ 
+/*ĐIỆN THOẠI*/ 
+@media (max-width: 768px) { 
+ 
+    body { 
+        padding: 15px; 
+    } 
+ 
+    main { 
+        padding: 20px; 
+    } 
+ 
+    .search-area, 
+    .filter { 
+        flex-direction: column; 
+        align-items: stretch; 
+    } 
+ 
+    .search-area input { 
+        width: 100%; 
+    } 
+ 
+    table { 
+        font-size: 13px; 
+    } 
+}

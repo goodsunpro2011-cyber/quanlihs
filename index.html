@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <!--==================================== HEADER ====================================-->
+
+    <header class="header">
+
+        <div class="logo-box"> Quản lí học sinh </div>
+
+        <!---->
+
+        <nav class="nav-menu">
+    <button onclick="document.getElementById('gioi-thieu').scrollIntoView({behavior: 'smooth'})" class="nav-link">Giới thiệu</button> 
+    <button onclick="document.getElementById('thuc-trang').scrollIntoView({behavior: 'smooth'})" class="nav-link">Thực trạng</button> 
+    <button onclick="document.getElementById('giai-phap').scrollIntoView({behavior: 'smooth'})" class="nav-link">Giải pháp</button> 
+    <button onclick="document.getElementById('trai-nghiem-demo').scrollIntoView({behavior: 'smooth'})" class="nav-link">Trải nghiệm Demo</button> 
+    <a onclick="document.getElementById('trai-nghiem-demo').scrollIntoView({behavior: 'smooth'})" class="nav-link" href="indexhtml.html" target="_blank">Cổng giáo viên</a> 
+</nav>
+
+    </header>
+
+    <!--==================================== HEADER ====================================-->
+
+    <!--==================================== GIỚI THIỆU ====================================-->
+    
+    <section id="gioi-thieu" class="section">
+        <br>
+
+        <h2 class="intro-title"><b>Giới thiệu</b></h2>
+
+        <div class="intro-box">
+
+            <img src="thptvd.webp" alt="Background" class="imgbg">
+
+            <h3 class="intro-subheading">Trang Web giúp quản lý kỷ luật, giảm thiểu đi học muộn</h3>
+
+            <p class="intro-desc">
+                Trang Web này giúp số hóa quy trình chấm điểm nề nếp, kỷ luật, điều phối, giám sát lưu lượng học sinh ra vào trường
+            </p>
+
+            <a onclick="document.getElementById('trai-nghiem-demo').scrollIntoView({behavior: 'smooth'})" class="intro-cta">[ Click vào đây để trải nghiệm sản phẩm ]</a>
+
+        </div>
+
+    </section>
+
+    <!--==================================== GIỚI THIỆU ====================================-->
+<br>
+<br>    
+<br>  
+    <!--==================================== THỰC TRẠNG ====================================-->
+    
+    <section id="thuc-trang" class="section">
+        <br>
+
+        <h2 class="intro-title"><b>Thực trạng</b></h2>
+
+        <div class="status-container">
+            
+
+            <!--Khung 1-->
+            <div class="status-card">
+                <h3 class="status-card-title">Quản lý thủ công</h3>
+                <p class="status-card-desc">Chấm điểm nề nếp bằng sổ sách dễ gây thất lạc, tốn thời gian tổng hợp và khó theo dõi chính xác.</p>
+            </div>
+            <!--Khung 1-->
+
+            <!--Khung 2-->
+            <div class="status-card">
+                <h3 class="status-card-title">Ùn tắc đầu giờ</h3>
+                <p class="status-card-desc">Lưu lượng học sinh đến trường cùng lúc gây khó khăn cho việc kiểm soát ra vào và giám sát đi học muộn.</p>
+            </div>
+            <!--Khung 2-->
+
+            <!--Khung 3-->
+            <div class="status-card">
+                <h3 class="status-card-title">Thiếu tính minh bạch</h3>
+                <p class="status-card-desc">Dữ liệu vi phạm không được cập nhật theo thời gian thực khiến nhà trường và phụ huynh khó phối hợp xử lý.</p>
+            </div>
+            <!--Khung 3-->
+        </div>
+
+    </section>
+
+    <!--==================================== THỰC TRẠNG ====================================-->
+<br>
+<br>
+<br>
+    <!--==================================== GIẢI PHÁP ====================================-->
+    
+    <section id="giai-phap" class="section">
+        <br>
+
+        <h2 class="intro-title"><b>Giải pháp</b></h2>
+
+        <div class="status-container">
+
+            <!--Khung 1-->
+            <div class="status-card">
+                <h3 class="status-card-title">Quét mã QR điểm danh</h3>
+                <p class="status-card-desc">Học sinh giơ thẻ/mã QR qua camera. Hệ thống tự động nhận diện và phân loại Đúng giờ (Xanh) hoặc Đi muộn (Đỏ).</p>
+            </div>
+            <!--Khung 1-->
+
+            <!--Khung 2-->
+            <div class="status-card">
+                <h3 class="status-card-title">Giải tỏa ùn tắc cổng trường</h3>
+                <p class="status-card-desc">Thao tác điểm danh bằng bàn phím mất chưa tới 2 giây/học sinh, giúp luồng học sinh di chuyển liên tục, loại bỏ hoàn toàn tình trạng dồn dâng tại cổng.</p>
+            </div>
+            <!--Khung 2-->
+
+            <!--Khung 3-->
+            <div class="status-card">
+                <h3 class="status-card-title">Tự động hóa & Minh bạch</h3>
+                <p class="status-card-desc">Danh sách học sinh đi muộn được lưu trữ tức thì và tự động cập nhật bảng thi đua các lớp, đảm bảo dữ liệu chính xác, công bằng và dễ theo dõi.</p>
+            </div>
+            <!--Khung 3-->
+        </div>
+
+    </section>
+
+    <!--==================================== GIẢI PHÁP ====================================-->
+<br>
+<br>
+<br>
+    <!--==================================== TRẢI NGHIỆM DEMO ====================================-->
+
+    <section id="trai-nghiem-demo" class="section">
+        <br>
+
+        <h2 class="intro-title"><b>Trải nghiệm Demo</b></h2>
+
+            <!--Khung 1-->
+                <div class="status-card">
+                    <label for="studentCode">Nhập mã học sinh :</label>
+                    <input type="text" id="studentCode">
+                    <button type="button" id="btnCheck">Xác nhận</button>
+                    <h3 id="thongBaoCheck" style="margin-top: 15px; color: #38bdf8;">Nhập mã học sinh tại đây</h3>
+                    <a class="intro-cta" href="mahocsinh.html" target="_blank">Ấn vào đây để tạo mã học sinh nếu chưa có</a>
+                </div>
+            <!--Khung 1-->
+
+    </section>
+
+    <!--==================================== TRẢI NGHIỆM DEMO ====================================-->
+<br>
+<br>
+<br>
+<hr>
+    <!--==================================== FOOTER ====================================-->
+
+        <footer class="footer">
+            <div class="footer-content">
+                <p><b>Hết ! :D</b></p>
+            </div>
+        </footer>
+
+    <!--==================================== FOOTER ====================================-->
+
+    <script src="index.js"></script>
+</body>
+</html>

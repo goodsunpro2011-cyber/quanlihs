@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng thống kê học sinh</title>
+    <link rel="stylesheet" href="stylecss.css">
+    
+    <!-- THƯ VIỆN SUPABASE CDN (BẮT BỘC) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+    <header>Cổng giáo viên</header>
+    
+    <main>
+        <h1>BẢNG THỐNG KÊ HỌC SINH</h1>
+        <div class="search-area">
+            <label for="searchInput">Tra cứu học sinh</label>
+            <input type="text" id="searchInput" placeholder="Tên học sinh">
+        </div>
+
+        <div class="filter">
+            <span>Lọc kết quả:</span>
+
+            <label>
+                <input type="checkbox" id="ontimeFilter"> Đúng giờ
+            </label>
+
+            <label>
+                <input type="checkbox" id="lateFilter"> Muộn giờ
+            </label>
+
+            <label>
+                Ngày quét
+                <input type="date" id="dateFilter">
+            </label>
+        </div>
+
+        <table>
+            <caption>Danh sách học sinh</caption>
+            <thead>
+                <tr>
+                    <th>Mã học sinh</th>
+                    <th>Họ và tên</th>
+                    <th>Lớp</th>
+                    <th>Thời gian quét</th>
+                    <th>Trạng thái</th>
+                </tr>
+            </thead>
+
+            <tbody id="studentTableBody">
+                <!-- JavaScript sẽ vẽ dữ liệu vào đây -->
+            </tbody>
+        </table>
+
+        <button id="downloadButton">Tải về bảng thống kê</button>
+    </main>
+
+    <script src="indexjs.js"></script>
+</body>
+
+</html>
