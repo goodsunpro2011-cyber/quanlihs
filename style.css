@@ -244,3 +244,55 @@ hr {
     filter: brightness(0.6) blur(1px);
     transition: all 0,5s ease;
 }
+
+@media screen and (max-width: 768px) {
+    /* Khung Header cố định trên cùng, gọn gàng */
+    header, .header, navbar, nav {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1000 !important;
+        background-color: #0f172a !important; /* Màu nền tối khớp với theme */
+    }
+
+    /* Thu nhỏ tiêu đề Quản lí học sinh */
+    .header h1, .header .logo, header a.logo, header h1 a {
+        font-size: 1.1rem !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Menu xếp trên 1 hoặc 2 hàng ngang, không bị nhảy dòng dọc dài */
+    .header nav, .nav-links, header ul {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 4px 8px !important; /* Khoảng cách nhỏ giữa các nút */
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Định dạng từng nút trong menu gọn gàng */
+    .header nav a, .nav-links a, header li a {
+        font-size: 0.75rem !important;
+        padding: 4px 8px !important;
+        white-space: nowrap !important;
+        border-radius: 4px !important;
+    }
+
+    /* Thu nhỏ các thẻ nội dung cho vừa khít màn hình */
+    .container, section, .card {
+        width: 100% !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    h2, .title {
+        font-size: 1.3rem !important;
+    }
+}
