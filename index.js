@@ -34,26 +34,23 @@ document.getElementById("btnCheck").addEventListener("click", async function () 
         } catch (e) {}
     }
 
-    // 2B. BƯỚC 2: Nếu LocalStorage không có, tra cứu trực tiếp trên Supabase Database
-    if (!hocSinh) {
-        const client = getSupabase();
-        if (client) {
-            const { data: records, error } = await client
-                .from('QLHS')
-                .select('*')
-                .eq('ma_hs', maNhap);
+    // 2B. BƯỚC 2: Tra cứu trực tiếp trên Supabase Database
+    const client = getSupabase();
 
-            if (!error && records && records.length > 0) {
-                // Tìm thấy học sinh trên Supabase Cloud!
-                let record = records[0];
-                hocSinh = {
-                    ten: record.hoten,
-                    lop: record.lop,
-                    maSo: record.ma_hs
-                };
-                // Đồng bộ ngược lại LocalStorage để lần sau dùng nhanh hơn
-                localStorage.setItem(maNhap, JSON.stringify(hocSinh));
-            }
+    if (!hocSinh && client) {
+        const { data: records, error } = await client
+            .from('QLHS')
+            .select('*')
+            .eq('ma_hs', maNhap);
+
+        if (!error && records && records.length > 0) {
+            let record = records[0];
+            hocSinh = {
+                ten: record.hoten,
+                lop: record.lop,
+                maSo: record.ma_hs
+            };
+            localStorage.setItem(maNhap, JSON.stringify(hocSinh));
         }
     }
 
@@ -76,18 +73,20 @@ document.getElementById("btnCheck").addEventListener("click", async function () 
         // Định dạng chuỗi thời gian hiển thị
         let thoiGianStr = now.toLocaleTimeString("vi-VN") + " - " + now.toLocaleDateString("vi-VN");
 
-        // --- LƯU LỊCH SỬ ĐỂ TRANG 3 ĐỌC DỮ LIỆU ---
-        let luotDiemDanh = {
-            maSo: maNhap,
-            ten: hocSinh.ten,
-            lop: hocSinh.lop,
-            thoiGian: thoiGianStr,
-            trangThai: trangThai
-        };
+        // --- CẬP NHẬT TRỰC TIẾP LÊN SUPABASE CLOUD ---
+        if (client) {
+            const { error: updateError } = await client
+                .from('QLHS')
+                .update({ 
+                    trang_thai: trangThai,
+                    created_at: now.toISOString() // Cập nhật thời gian vừa quét mới nhất
+                })
+                .eq('ma_hs', maNhap);
 
-        // Lưu bản ghi điểm danh này theo key riêng để Trang 3 vẽ bảng
-        let keyLichSu = "CHECKIN_" + maNhap + "_" + Date.now();
-        localStorage.setItem(keyLichSu, JSON.stringify(luotDiemDanh));
+            if (updateError) {
+                console.error("Lỗi cập nhật điểm danh lên Cloud:", updateError);
+            }
+        }
 
         // --- HIỂN THỊ KẾT QUẢ RA MÀN HÌNH ---
         let mauTrangThai = trangThai === "Đi muộn" ? "#ef4444" : "#10b981";
