@@ -12,7 +12,6 @@ function getSupabase() {
     return _supabaseClient;
 }
 
-// Bắt các phần tử HTML
 const tableBody = document.getElementById("studentTableBody");
 const searchInput = document.getElementById("searchInput");
 const ontimeFilter = document.getElementById("ontimeFilter");
@@ -29,7 +28,6 @@ async function fetchStudentsFromCloud() {
     const client = getSupabase();
     if (!client) return [];
 
-    // Lấy toàn bộ danh sách học sinh từ Supabase QLHS
     const { data, error } = await client.from('QLHS').select('*');
     if (error || !data) {
         console.error("Lỗi lấy dữ liệu Supabase:", error);
@@ -37,7 +35,6 @@ async function fetchStudentsFromCloud() {
     }
 
     return data.map(item => {
-        // Xử lý định dạng thời gian từ cột created_at của Supabase
         let formattedTime = "Chưa quét";
         if (item.created_at) {
             const dateObj = new Date(item.created_at);
@@ -48,11 +45,20 @@ async function fetchStudentsFromCloud() {
             }
         }
 
+        // Nhận diện đồng nhất cả "Đi muộn" và "Muộn giờ"
+        let rawStatus = item.trang_thai || item.trangthai;
+        let finalStatus = "Chưa điểm danh";
+        if (rawStatus === "Đi muộn" || rawStatus === "Muộn giờ") {
+            finalStatus = "Muộn giờ";
+        } else if (rawStatus === "Đúng giờ") {
+            finalStatus = "Đúng giờ";
+        }
+
         return {
             maSo: item.ma_hs || "",
             ten: item.hoten || "",
             lop: item.lop || "Chưa xếp",
-            trangThai: item.trang_thai || "Chưa điểm danh",
+            trangThai: finalStatus,
             thoiGian: formattedTime,
             rawDate: item.created_at ? item.created_at.split('T')[0] : ""
         };
@@ -110,13 +116,11 @@ function filterStudents() {
     const selectedDate = dateFilter ? dateFilter.value : "";
 
     const filtered = students.filter(student => {
-        // Lọc theo Tên hoặc Mã
         const name = (student.ten || "").toLowerCase();
         const code = (student.maSo || "").toLowerCase();
         const matchSearch = name.includes(keyword) || code.includes(keyword);
         if (!matchSearch) return false;
 
-        // Lọc theo Trạng thái
         let matchStatus = true;
         if (showOntime || showLate) {
             let status = student.trangThai;
@@ -129,7 +133,6 @@ function filterStudents() {
             }
         }
 
-        // Lọc theo Ngày
         let matchDate = true;
         if (selectedDate && student.rawDate) {
             matchDate = (student.rawDate === selectedDate);
@@ -142,34 +145,7 @@ function filterStudents() {
 }
 
 // ==========================================
-// 5. XUẤT FILE EXCEL / CSV
-// ==========================================
-function downloadTable() {
-    const rows = tableBody.querySelectorAll("tr");
-    let csv = "Mã học sinh,Họ và tên,Lớp,Thời gian quét,Trạng thái\n";
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll("td");
-        if (cells.length !== 5) return;
-
-        const rowData = [];
-        cells.forEach(cell => {
-            rowData.push(`"${cell.innerText.replace(/"/g, '""')}"`);
-        });
-        csv += rowData.join(",") + "\n";
-    });
-
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "bang-thong-ke-hoc-sinh.csv";
-    link.click();
-    URL.revokeObjectURL(url);
-}
-
-// ==========================================
-// 6. KHỞI CHẠY VÀ TỰ ĐỘNG CẬP NHẬT
+// 5. KHỞI CHẠY VÀ TỰ ĐỘNG CẬP NHẬT
 // ==========================================
 async function loadData() {
     students = await fetchStudentsFromCloud();
@@ -178,11 +154,8 @@ async function loadData() {
 
 document.addEventListener("DOMContentLoaded", async () => {
     await loadData();
-
-    // Tự động tải lại dữ liệu mới từ Cloud mỗi 3 giây
     setInterval(loadData, 3000);
 
-    // Gắn sự kiện lọc
     if (searchInput) searchInput.addEventListener("input", filterStudents);
     if (ontimeFilter) ontimeFilter.addEventListener("change", filterStudents);
     if (lateFilter) lateFilter.addEventListener("change", filterStudents);
