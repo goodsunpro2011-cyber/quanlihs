@@ -145,7 +145,43 @@ function filterStudents() {
 }
 
 // ==========================================
-// 5. KHỞI CHẠY VÀ TỰ ĐỘNG CẬP NHẬT
+// 5. HÀM TẢI VỀ BẢNG THỐNG KÊ (EXCEL/CSV)
+// ==========================================
+function downloadTable() {
+    if (!students || students.length === 0) {
+        alert("Không có dữ liệu học sinh để tải về!");
+        return;
+    }
+
+    // Tiêu đề cột (Thêm \uFEFF để hiển thị đúng tiếng Việt trong Excel)
+    let csvContent = "\uFEFFMã học sinh,Họ và tên,Lớp,Thời gian quét,Trạng thái\n";
+
+    students.forEach(student => {
+        let maSo = `"${student.maSo || ''}"`;
+        let ten = `"${student.ten || ''}"`;
+        let lop = `"${student.lop || ''}"`;
+        let thoiGian = `"${student.thoiGian || ''}"`;
+        let trangThai = `"${student.trangThai || ''}"`;
+
+        csvContent += `${maSo},${ten},${lop},${thoiGian},${trangThai}\n`;
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0, 10);
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Thong_Ke_Diem_Danh_${dateStr}.csv`);
+
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// ==========================================
+// 6. KHỞI CHẠY VÀ TỰ ĐỘNG CẬP NHẬT
 // ==========================================
 async function loadData() {
     students = await fetchStudentsFromCloud();
