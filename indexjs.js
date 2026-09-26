@@ -21,70 +21,46 @@ const dateFilter = document.getElementById("dateFilter");
 const downloadButton = document.getElementById("downloadButton");
 
 let students = [];
-let checkins = [];
 
 // ==========================================
-// 2. TẢI DỮ LIỆU HỌC SINH (LOCAL + SUPABASE)
+// 2. TẢI DỮ LIỆU TỪ SUPABASE CLOUD
 // ==========================================
-async function fetchStudents() {
-    const list = [];
-    
-    // A. Quét LocalStorage
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("HS")) {
-            try {
-                const data = JSON.parse(localStorage.getItem(key));
-                if (data && data.maSo) list.push(data);
-            } catch (e) {}
-        }
-    }
-
-    // B. Quét thêm từ Supabase Cloud để phòng trường hợp máy mới / xóa LocalStorage
+async function fetchStudentsFromCloud() {
     const client = getSupabase();
-    if (client) {
-        const { data, error } = await client.from('QLHS').select('*');
-        if (!error && data) {
-            data.forEach(item => {
-                // Nếu chưa có trong danh sách thì thêm vào
-                if (!list.some(s => s.maSo === item.ma_hs)) {
-                    list.push({
-                        maSo: item.ma_hs,
-                        ten: item.hoten,
-                        lop: item.lop
-                    });
-                }
-            });
-        }
+    if (!client) return [];
+
+    // Lấy toàn bộ danh sách học sinh từ Supabase QLHS
+    const { data, error } = await client.from('QLHS').select('*');
+    if (error || !data) {
+        console.error("Lỗi lấy dữ liệu Supabase:", error);
+        return [];
     }
-    return list;
-}
 
-// ==========================================
-// 3. TẢI LỊCH SỬ ĐIỂM DANH (LOCALSTORAGE)
-// ==========================================
-function getCheckins() {
-    const list = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && key.startsWith("CHECKIN_")) {
-            try {
-                const data = JSON.parse(localStorage.getItem(key));
-                if (data) list.push(data);
-            } catch (e) {}
+    return data.map(item => {
+        // Xử lý định dạng thời gian từ cột created_at của Supabase
+        let formattedTime = "Chưa quét";
+        if (item.created_at) {
+            const dateObj = new Date(item.created_at);
+            if (!isNaN(dateObj.getTime())) {
+                const timeStr = dateObj.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                const dateStr = dateObj.toLocaleDateString('vi-VN');
+                formattedTime = `${timeStr} - ${dateStr}`;
+            }
         }
-    }
-    return list;
-}
 
-function getLatestCheckin(maSo) {
-    const result = checkins.filter(c => c.maSo === maSo);
-    if (result.length === 0) return null;
-    return result[result.length - 1]; // Lấy lượt điểm danh mới nhất
+        return {
+            maSo: item.ma_hs || "",
+            ten: item.hoten || "",
+            lop: item.lop || "Chưa xếp",
+            trangThai: item.trang_thai || "Chưa điểm danh",
+            thoiGian: formattedTime,
+            rawDate: item.created_at ? item.created_at.split('T')[0] : ""
+        };
+    });
 }
 
 // ==========================================
-// 4. HIỂN THỊ DỮ LIỆU RA BẢNG HTML (ĐÃ SỬA CHUẨN CỘT)
+// 3. HIỂN THỊ DỮ LIỆU RA BẢNG HTML
 // ==========================================
 function displayStudents(list) {
     if (!tableBody) return;
@@ -102,23 +78,21 @@ function displayStudents(list) {
 
     list.forEach(student => {
         const row = document.createElement("tr");
-        const latestCheckin = getLatestCheckin(student.maSo);
 
-        let timeAndDate = "Chưa quét";
-        let status = "Chưa điểm danh";
+        let status = student.trangThai;
+        let timeAndDate = student.thoiGian;
         let statusColor = "#888";
 
-        if (latestCheckin) {
-            timeAndDate = latestCheckin.thoiGian || "Đã quét";
-            status = latestCheckin.trangThai === "Đi muộn" ? "Muộn giờ" : latestCheckin.trangThai;
-            statusColor = (status === "Muộn giờ" || status === "Đi muộn") ? "#ef4444" : "#10b981";
+        if (status === "Muộn giờ" || status === "Đi muộn") {
+            statusColor = "#ef4444";
+        } else if (status === "Đúng giờ") {
+            statusColor = "#10b981";
         }
 
-        // Cấu trúc cột chuẩn: Mã học sinh | Họ và tên | Lớp | Thời gian quét | Trạng thái
         row.innerHTML = `
-            <td><b>${student.maSo || ""}</b></td>
-            <td>${student.ten || ""}</td>
-            <td>${student.lop || "Chưa xếp"}</td>
+            <td><b>${student.maSo}</b></td>
+            <td>${student.ten}</td>
+            <td>${student.lop}</td>
             <td>${timeAndDate}</td>
             <td style="color: ${statusColor}; font-weight: bold;">${status}</td>
         `;
@@ -127,7 +101,7 @@ function displayStudents(list) {
 }
 
 // ==========================================
-// 5. TÌM KIẾM VÀ LỌC DỮ LIỆU
+// 4. TÌM KIẾM VÀ LỌC DỮ LIỆU
 // ==========================================
 function filterStudents() {
     const keyword = searchInput ? searchInput.value.trim().toLowerCase() : "";
@@ -136,43 +110,29 @@ function filterStudents() {
     const selectedDate = dateFilter ? dateFilter.value : "";
 
     const filtered = students.filter(student => {
-        // A. Tìm theo Tên hoặc Mã HS
+        // Lọc theo Tên hoặc Mã
         const name = (student.ten || "").toLowerCase();
         const code = (student.maSo || "").toLowerCase();
         const matchSearch = name.includes(keyword) || code.includes(keyword);
         if (!matchSearch) return false;
 
-        const latestCheckin = getLatestCheckin(student.maSo);
-
-        // B. Lọc theo Trạng thái (Đúng giờ / Muộn giờ)
+        // Lọc theo Trạng thái
         let matchStatus = true;
         if (showOntime || showLate) {
-            if (!latestCheckin) return false;
-
-            let status = latestCheckin.trangThai === "Đi muộn" ? "Muộn giờ" : latestCheckin.trangThai;
-
+            let status = student.trangThai;
             if (showOntime && !showLate) {
                 matchStatus = (status === "Đúng giờ");
             } else if (!showOntime && showLate) {
-                matchStatus = (status === "Muộn giờ");
+                matchStatus = (status === "Muộn giờ" || status === "Đi muộn");
             } else {
-                matchStatus = (status === "Đúng giờ" || status === "Muộn giờ");
+                matchStatus = (status === "Đúng giờ" || status === "Muộn giờ" || status === "Đi muộn");
             }
         }
 
-        // C. Lọc theo Ngày quét
+        // Lọc theo Ngày
         let matchDate = true;
-        if (selectedDate) {
-            if (!latestCheckin) return false;
-
-            const parts = selectedDate.split("-"); // Dạng YYYY-MM-DD từ input date
-            const formattedDate = `${parseInt(parts[2])}/${parseInt(parts[1])}/${parts[0]}`; // Đổi thành D/M/YYYY
-
-            const studentCheckins = checkins.filter(c => c.maSo === student.maSo);
-            matchDate = studentCheckins.some(c => {
-                const checkinTimeStr = c.thoiGian || "";
-                return checkinTimeStr.includes(formattedDate);
-            });
+        if (selectedDate && student.rawDate) {
+            matchDate = (student.rawDate === selectedDate);
         }
 
         return matchSearch && matchStatus && matchDate;
@@ -182,7 +142,7 @@ function filterStudents() {
 }
 
 // ==========================================
-// 6. XUẤT FILE EXCEL / CSV
+// 5. XUẤT FILE EXCEL / CSV
 // ==========================================
 function downloadTable() {
     const rows = tableBody.querySelectorAll("tr");
@@ -209,17 +169,20 @@ function downloadTable() {
 }
 
 // ==========================================
-// 7. KHỞI CHẠY TRANG WEB
+// 6. KHỞI CHẠY VÀ TỰ ĐỘNG CẬP NHẬT
 // ==========================================
+async function loadData() {
+    students = await fetchStudentsFromCloud();
+    filterStudents();
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
-    // Lấy lịch sử checkin & danh sách học sinh
-    checkins = getCheckins();
-    students = await fetchStudents();
+    await loadData();
 
-    // Hiển thị dữ liệu
-    displayStudents(students);
+    // Tự động tải lại dữ liệu mới từ Cloud mỗi 3 giây
+    setInterval(loadData, 3000);
 
-    // Lắng nghe sự kiện người dùng tương tác
+    // Gắn sự kiện lọc
     if (searchInput) searchInput.addEventListener("input", filterStudents);
     if (ontimeFilter) ontimeFilter.addEventListener("change", filterStudents);
     if (lateFilter) lateFilter.addEventListener("change", filterStudents);
